@@ -1,0 +1,4 @@
+/Users/urielsofer/Applications/CLion.app/Contents/bin/cmake/mac/aarch64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Users/urielsofer/Applications/CLion.app/Contents/bin/ninja/mac/aarch64/ninja -G Ninja -S "/Users/urielsofer/Documents/Local CS Degree/Year 2/CPP/HWs/HW4AdvancedDrones" -B "/Users/urielsofer/Documents/Local CS Degree/Year 2/CPP/HWs/HW4AdvancedDrones/cmake-build-debug"
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/urielsofer/Documents/Local CS Degree/Year 2/CPP/HWs/HW4AdvancedDrones/cmake-build-debug
