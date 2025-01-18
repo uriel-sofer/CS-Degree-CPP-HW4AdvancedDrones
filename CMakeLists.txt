@@ -18,4 +18,11 @@ add_executable(HW4AdvancedDrones main.cpp
         Simulation.h
         Vector.h
         SingleRotor.cpp
-        SingleRotor.h)
+        SingleRotor.h
+        AVLTree.h
+        MultiRotor.cpp
+        MultiRotor.h
+        FixedWing.cpp
+        FixedWing.h
+        HybridDrone.cpp
+        HybridDrone.h)

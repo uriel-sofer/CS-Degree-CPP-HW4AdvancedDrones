@@ -1,20 +1,53 @@
 #include "Simulation.h"
+#include "SingleRotor.h"
+#include "MultiRotor.h"
+#include "FixedWing.h"
+#include "HybridDrone.h"
+
 #include <iostream>
 #include <fstream>
-#include <ctime>
 #include <iomanip>
 
-Simulation::Simulation(const Config& config, const Init& init) :
-target(config.target), AMOUNT(init.dronesAmount), iterations(config.iterations),globalBestIndex(0), forest()
+Simulation::Simulation(const Config &config, const Init &init) : target(config.target), AMOUNT(init.dronesAmount),
+                                                                 iterations(config.iterations), globalBestIndex(0),
+                                                                 forest()
 {
-    drones = new Drone[AMOUNT];
-    for (size_t i = 0; i < AMOUNT; i++)
+    const unsigned int width = Point::MAX_WIDTH_X - Point::MIN_WIDTH_X;
+    const unsigned int height = Point::MAX_HEIGHT_Y - Point::MIN_HEIGHT_Y;
+
+    forest = new ForestIndex *[width];
+    for (int i = 0; i < width; ++i)
     {
-        new (&drones[i]) Drone(init.initialLocations[i], init.speeds[i], target);
+        forest[i] = new ForestIndex[height];
+    }
+
+    drones = new Drone*[AMOUNT];
+    for (size_t i = 0; i < AMOUNT; ++i)
+    {
+        // Dynamically allocate the correct derived drone type based on init.dronesTypes[i]
+        switch (init.dronesTypes[i])
+        {
+            case 'S':
+                drones[i] = new SingleRotor(init.initialLocations[i], init.speeds[i], target, 'S');
+                break;
+            case 'M':
+                drones[i] = new MultiRotor(init.initialLocations[i], init.speeds[i], target, 'M');
+                break;
+            case 'W':
+                drones[i] = new FixedWing(init.initialLocations[i], init.speeds[i], target, 'W');
+                break;
+            case 'H':
+                drones[i] = new HybridDrone(init.initialLocations[i], init.speeds[i], target, 'H');
+                break;
+            default:
+                throw std::invalid_argument("Unknown drone type");
+        }
+
+        // Insert the drone into the tree
+        this->dronesTree.insert(drones[i]);
         updatePersonalBest(i);
     }
     updateGlobalBest();
-    std::srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 Simulation::~Simulation()
@@ -40,14 +73,14 @@ void Simulation::updateGlobalBest()
     */
     for (size_t currentIndex = 0; currentIndex < AMOUNT; currentIndex++)
     {
-        if (drones[currentIndex].isOnTarget(target))
+        if (drones[currentIndex]->isOnTarget(target))
         {
             globalBestIndex = currentIndex;
             return;
         }
 
-        if (drones[currentIndex].getLocation().euclideanDistance(target) <
-            drones[globalBestIndex].getLocation().euclideanDistance(target))
+        if (drones[currentIndex]->getLocation().euclideanDistance(target) <
+            drones[globalBestIndex]->getLocation().euclideanDistance(target))
         {
             globalBestIndex = currentIndex; // Update the global best index
         }
@@ -56,33 +89,42 @@ void Simulation::updateGlobalBest()
 
 void Simulation::updatePersonalBest(const size_t currentIndex) const
 {
-    if (drones[currentIndex].getLocation().euclideanDistance(target) <
-        drones[currentIndex].getPB().euclideanDistance(target))
+    if (drones[currentIndex]->getLocation().euclideanDistance(target) <
+        drones[currentIndex]->getPB().euclideanDistance(target))
     {
-        drones[currentIndex].setPB(drones[currentIndex].getLocation());
+        drones[currentIndex]->setPB(drones[currentIndex]->getLocation());
     }
 }
 
-const DirectionalVector& Simulation::getTarget() const
+const DirectionalVector &Simulation::getTarget() const
 {
     return target;
 }
 
+void Simulation::printDronesTree()
+{
+    std::cout << "Simulation ended: Not all drones reached the target." << std::endl;
+    std::cout << "Tree:" << std::endl;
+    dronesTree.print();
+    dronesTree.clear();
+}
+
 void Simulation::run()
 {
-    // std::cout << "Initial state: " << std::endl;
-    // printState();
+    std::cout << "Initial state: " << std::endl;
+    printState();
     for (unsigned int step = 0; step < iterations; ++step)
     {
         for (size_t i = 0; i < AMOUNT; ++i)
         {
-            GridIndex oldIndex = getGridIndex(drones[i].getLocation());
+            GridIndex oldIndex = getGridIndex(drones[i]->getLocation());
 
-            drones[i].move(drones[globalBestIndex]);
+            drones[i]->move(*drones[globalBestIndex]);
 
-            GridIndex newIndex = getGridIndex(drones[i].getLocation());
+            // Override in the tree
+            dronesTree.insert(drones[i]);
 
-            if (oldIndex != newIndex)
+            if (GridIndex newIndex = getGridIndex(drones[i]->getLocation()); oldIndex != newIndex)
             {
                 --forest[oldIndex.x][oldIndex.y];
                 ++forest[newIndex.x][newIndex.y];
@@ -90,11 +132,11 @@ void Simulation::run()
 
             updatePersonalBest(i);
 
-            if (drones[i].isOnTarget(target))
+            if (drones[i]->isOnTarget(target))
             {
-                // std::cout << "Step " << step + 1 << std::endl;
-                // printState();
-                // std::cout << "Drone " << drones[i].getID() << " reached the target!" << std::endl;
+                std::cout << "Step " << step + 1 << std::endl;
+                printState();
+                std::cout << "Drone " << drones[i]->getID() << " reached the target!" << std::endl;
                 return; // End simulation early
             }
         }
@@ -103,13 +145,14 @@ void Simulation::run()
 
         for (int i = 0; i < AMOUNT; ++i)
         {
-            drones[i].updateVelocity(drones[globalBestIndex]);
+            drones[i]->updateVelocity(*drones[globalBestIndex]);
         }
-        // std::cout << "Step " << step + 1 << std::endl;
-        // printState();
+
+        std::cout << "Step " << step + 1 << std::endl;
+        printState();
     }
 
-    // std::cout << "Simulation ended: Not all drones reached the target." << std::endl;
+    printDronesTree();
 }
 
 // Print the state of the simulation
@@ -118,9 +161,9 @@ void Simulation::printState() const
     std::cout << "Target: " << target << std::endl;
     for (size_t i = 0; i < AMOUNT; ++i)
     {
-        std::cout << drones[i] << std::endl;
+        std::cout << *drones[i];
     }
-    std::cout << "Global best: " << drones[globalBestIndex] << std::endl;
+    std::cout << "Global best: " << *drones[globalBestIndex];
 }
 
 // // Save the state to a file, commented because I think mine's better
@@ -145,7 +188,7 @@ void Simulation::printState() const
 //     std::cout << "Simulation state saved to " << outputFile << std::endl;
 // }
 
-void Simulation::saveState(const std::string& outputFile) const
+void Simulation::saveState(const std::string &outputFile) const
 {
     std::ofstream file(outputFile);
     if (!file.is_open())
@@ -156,17 +199,17 @@ void Simulation::saveState(const std::string& outputFile) const
 
     file << iterations << std::endl;
 
-    // file << std::defaultfloat << std::setprecision(3);
+    file << std::defaultfloat << std::setprecision(3);
 
     for (size_t i = 0; i < AMOUNT; ++i)
     {
-        file << drones[i].getLocation() << std::endl;
+        file << drones[i]->getDroneType() << " " << drones[i]->getLocation() << std::endl;
     }
 
     file.close();
 }
 
-GridIndex Simulation::getGridIndex(const DirectionalVector& position)
+GridIndex Simulation::getGridIndex(const DirectionalVector &position)
 {
     const int gridX = static_cast<int>(position.getX());
     const int gridY = static_cast<int>(position.getY());

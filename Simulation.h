@@ -5,15 +5,19 @@
 #include "Drone.h"
 #include "FileHandler.h"
 #include "ForestIndex.h"
+#include "BinarySearchTree.h"
 
 class Simulation {
 private:
     DirectionalVector target; // Target location
     const size_t AMOUNT; // Amount of drones in the simulation
-    Drone* drones; // The array of the drones
+    Drone** drones; // The array of the drones
+
+    BinarySearchTree<Drone*> dronesTree;
+
     const unsigned int iterations; // Number of simulation steps
     size_t globalBestIndex; // Index of the global best drone
-    ForestIndex forest[Point::MAX_WIDTH_X][Point::MAX_HEIGHT_Y];
+    ForestIndex** forest;
 
 public:
     Simulation(const Config& config, const Init& init);
@@ -26,6 +30,8 @@ public:
     static GridIndex getGridIndex(const DirectionalVector& position); // Converts the DirectionalVector to an GridIndex
 
     const DirectionalVector& getTarget() const;
+
+    void printDronesTree();
 
     unsigned int operator()(unsigned int x, unsigned int y) const; // Returns amount of drones in x,y
 };

@@ -1,6 +1,13 @@
 #include "Point.h"
 #include <cmath>
 
+#include "Point.h"
+
+// Define static members
+int Point::MAX_WIDTH_X = 72;
+int Point::MAX_HEIGHT_Y = 42;
+int Point::MIN_WIDTH_X = 0;
+int Point::MIN_HEIGHT_Y = 0;
 
 Point::Point() : x(0), y(0) {}
 
@@ -68,13 +75,26 @@ bool Point::operator==(const Point& point) const
     return x == point.x and y == point.y;
 }
 
+void Point::setLimits(const int* limits)
+{
+    MIN_WIDTH_X = limits[0];
+    MIN_HEIGHT_Y = limits[1];
+    MAX_WIDTH_X = limits[2];
+    MAX_HEIGHT_Y = limits[3];
+}
+
+bool Point::validateCoordinates(const double x, const double y)
+{
+    return  not (x < MIN_WIDTH_X or y < MIN_HEIGHT_Y or x > MAX_WIDTH_X or y > MAX_HEIGHT_Y);
+}
+
 void Point::limitPoint()
 {
     if (this->x > MAX_WIDTH_X) this->x = MAX_WIDTH_X;
-    if (this->x < 0) this->x = 0;
+    if (this->x < MIN_WIDTH_X) this->x = MIN_WIDTH_X;
 
     if (this->y > MAX_HEIGHT_Y) this->y = MAX_HEIGHT_Y;
-    if (this->y < 0) this->y = 0;
+    if (this->y < MIN_HEIGHT_Y) this->y = MIN_HEIGHT_Y;
 }
 
 double Point::distance(const Point& other) const

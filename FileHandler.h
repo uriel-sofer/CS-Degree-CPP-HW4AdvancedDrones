@@ -1,7 +1,6 @@
 #ifndef FILEHANDLER_H
 #define FILEHANDLER_H
 
-#include <string>
 #include "Point.h"
 #include "Vector.h"
 #include "DirectionalVector.h"
@@ -13,9 +12,10 @@
 struct Config {
     DirectionalVector target;
     unsigned int iterations;
+    int *limits; // x_min, y_min, x_max, y_max
 
-    Config(const Point& target, const unsigned int iterations)
-        : target(target), iterations(iterations) {}
+    Config(const Point& target, const unsigned int iterations, int limits[4])
+        : target(target), iterations(iterations), limits(limits) {}
 
     Config() : target(Point()), iterations(0) {}
 };
@@ -26,6 +26,7 @@ struct Config {
 struct Init {
     Vector<DirectionalVector> initialLocations;
     Vector<DirectionalVector> speeds;
+    Vector<char> dronesTypes;
     int dronesAmount = 0;
 
     Init() = default; // Does it count as an object? Anyway default is enough
