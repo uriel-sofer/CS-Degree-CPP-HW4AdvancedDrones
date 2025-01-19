@@ -13,8 +13,6 @@ private:
     const size_t AMOUNT; // Amount of drones in the simulation
     Drone** drones; // The array of the drones
 
-    BinarySearchTree<Drone*> dronesTree;
-
     const unsigned int iterations; // Number of simulation steps
     size_t globalBestIndex; // Index of the global best drone
     ForestIndex** forest;

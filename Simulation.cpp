@@ -24,27 +24,26 @@ Simulation::Simulation(const Config &config, const Init &init) : target(config.t
     drones = new Drone*[AMOUNT];
     for (size_t i = 0; i < AMOUNT; ++i)
     {
-        // Dynamically allocate the correct derived drone type based on init.dronesTypes[i]
+        Drone* curr;
         switch (init.dronesTypes[i])
         {
             case 'S':
-                drones[i] = new SingleRotor(init.initialLocations[i], init.speeds[i], target, 'S');
+                curr = drones[i] = new SingleRotor(init.initialLocations[i], init.speeds[i], target, 'S');
                 break;
             case 'M':
-                drones[i] = new MultiRotor(init.initialLocations[i], init.speeds[i], target, 'M');
+                curr = drones[i] = new MultiRotor(init.initialLocations[i], init.speeds[i], target, 'M');
                 break;
             case 'W':
-                drones[i] = new FixedWing(init.initialLocations[i], init.speeds[i], target, 'W');
+                curr = drones[i] = new FixedWing(init.initialLocations[i], init.speeds[i], target, 'W');
                 break;
             case 'H':
-                drones[i] = new HybridDrone(init.initialLocations[i], init.speeds[i], target, 'H');
+                curr = drones[i] = new HybridDrone(init.initialLocations[i], init.speeds[i], target, 'H');
                 break;
             default:
                 throw std::invalid_argument("Unknown drone type");
         }
 
-        // Insert the drone into the tree
-        this->dronesTree.insert(drones[i]);
+
         updatePersonalBest(i);
     }
     updateGlobalBest();
@@ -52,6 +51,13 @@ Simulation::Simulation(const Config &config, const Init &init) : target(config.t
 
 Simulation::~Simulation()
 {
+    const unsigned int width = Point::MAX_WIDTH_X - Point::MIN_WIDTH_X;
+
+    for (size_t i = 0; i < width; ++i)
+    {
+        delete forest[i];
+    }
+    delete[] forest;
     delete[] drones;
 }
 
@@ -96,7 +102,7 @@ void Simulation::updatePersonalBest(const size_t currentIndex) const
     }
 }
 
-const DirectionalVector &Simulation::getTarget() const
+const DirectionalVector& Simulation::getTarget() const
 {
     return target;
 }
@@ -105,8 +111,6 @@ void Simulation::printDronesTree()
 {
     std::cout << "Simulation ended: Not all drones reached the target." << std::endl;
     std::cout << "Tree:" << std::endl;
-    dronesTree.print();
-    dronesTree.clear();
 }
 
 void Simulation::run()
@@ -120,9 +124,6 @@ void Simulation::run()
             GridIndex oldIndex = getGridIndex(drones[i]->getLocation());
 
             drones[i]->move(*drones[globalBestIndex]);
-
-            // Override in the tree
-            dronesTree.insert(drones[i]);
 
             if (GridIndex newIndex = getGridIndex(drones[i]->getLocation()); oldIndex != newIndex)
             {

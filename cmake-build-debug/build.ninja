@@ -115,6 +115,12 @@ build CMakeFiles/HW4AdvancedDrones.dir/HybridDrone.cpp.o: CXX_COMPILER__HW4Advan
   OBJECT_DIR = CMakeFiles/HW4AdvancedDrones.dir
   OBJECT_FILE_DIR = CMakeFiles/HW4AdvancedDrones.dir
 
+build CMakeFiles/HW4AdvancedDrones.dir/TreeSim.cpp.o: CXX_COMPILER__HW4AdvancedDrones_unscanned_Debug /Users/urielsofer/Documents/Local$ CS$ Degree/Year$ 2/CPP/HWs/HW4AdvancedDrones/TreeSim.cpp || cmake_object_order_depends_target_HW4AdvancedDrones
+  DEP_FILE = CMakeFiles/HW4AdvancedDrones.dir/TreeSim.cpp.o.d
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/HW4AdvancedDrones.dir
+  OBJECT_FILE_DIR = CMakeFiles/HW4AdvancedDrones.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target HW4AdvancedDrones
@@ -123,7 +129,7 @@ build CMakeFiles/HW4AdvancedDrones.dir/HybridDrone.cpp.o: CXX_COMPILER__HW4Advan
 #############################################
 # Link the executable HW4AdvancedDrones
 
-build HW4AdvancedDrones: CXX_EXECUTABLE_LINKER__HW4AdvancedDrones_Debug CMakeFiles/HW4AdvancedDrones.dir/main.cpp.o CMakeFiles/HW4AdvancedDrones.dir/DirectionalVector.cpp.o CMakeFiles/HW4AdvancedDrones.dir/Drone.cpp.o CMakeFiles/HW4AdvancedDrones.dir/FileHandler.cpp.o CMakeFiles/HW4AdvancedDrones.dir/ForestIndex.cpp.o CMakeFiles/HW4AdvancedDrones.dir/Point.cpp.o CMakeFiles/HW4AdvancedDrones.dir/Simulation.cpp.o CMakeFiles/HW4AdvancedDrones.dir/SingleRotor.cpp.o CMakeFiles/HW4AdvancedDrones.dir/MultiRotor.cpp.o CMakeFiles/HW4AdvancedDrones.dir/FixedWing.cpp.o CMakeFiles/HW4AdvancedDrones.dir/HybridDrone.cpp.o
+build HW4AdvancedDrones: CXX_EXECUTABLE_LINKER__HW4AdvancedDrones_Debug CMakeFiles/HW4AdvancedDrones.dir/main.cpp.o CMakeFiles/HW4AdvancedDrones.dir/DirectionalVector.cpp.o CMakeFiles/HW4AdvancedDrones.dir/Drone.cpp.o CMakeFiles/HW4AdvancedDrones.dir/FileHandler.cpp.o CMakeFiles/HW4AdvancedDrones.dir/ForestIndex.cpp.o CMakeFiles/HW4AdvancedDrones.dir/Point.cpp.o CMakeFiles/HW4AdvancedDrones.dir/Simulation.cpp.o CMakeFiles/HW4AdvancedDrones.dir/SingleRotor.cpp.o CMakeFiles/HW4AdvancedDrones.dir/MultiRotor.cpp.o CMakeFiles/HW4AdvancedDrones.dir/FixedWing.cpp.o CMakeFiles/HW4AdvancedDrones.dir/HybridDrone.cpp.o CMakeFiles/HW4AdvancedDrones.dir/TreeSim.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk
   OBJECT_DIR = CMakeFiles/HW4AdvancedDrones.dir
   POST_BUILD = :
