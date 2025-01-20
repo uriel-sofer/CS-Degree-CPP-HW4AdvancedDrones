@@ -1,7 +1,11 @@
-#include "TreeSim.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include "TreeSim.h"
+#include "SingleRotor.h"
+#include "MultiRotor.h"
+#include "FixedWing.h"
+#include "HybridDrone.h"
 
 // Static function to delete a drone
 void TreeSim::deleteDrone(const Drone *drone)
@@ -133,15 +137,13 @@ void TreeSim::saveState(const std::string &outputFile) const
     {
         std::cerr << "Error; Invalid input";
         throw std::invalid_argument("Could not open file " + outputFile);
-        // std::cerr << "Error: Could not open file " << outputFile << std::endl;
-        // return;
     }
 
     file << iterations << std::endl;
-    file << std::defaultfloat << std::setprecision(3);
 
     dronesTree.traverseInOrder([&file](const Drone *drone) {
-        file << drone->getDroneType() << " " << drone->getLocation() << std::endl;
+        file << drone->getDroneType() << " ";
+        file << std::fixed << std::setprecision(2) << std::showpoint << drone->getLocation() << std::endl;
     });
 
     file.close();

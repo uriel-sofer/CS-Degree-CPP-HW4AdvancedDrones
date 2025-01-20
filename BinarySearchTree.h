@@ -2,6 +2,8 @@
 #define BINARY_SEARCH_TREE_H
 
 #include <iostream>
+#include <limits>
+
 #include "DirectionalVector.h"
 
 template<class T>

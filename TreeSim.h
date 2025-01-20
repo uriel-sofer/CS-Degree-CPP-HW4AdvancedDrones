@@ -4,10 +4,6 @@
 #include "BinarySearchTree.h"
 #include "DirectionalVector.h"
 #include "Drone.h"
-#include "SingleRotor.h"
-#include "MultiRotor.h"
-#include "FixedWing.h"
-#include "HybridDrone.h"
 #include "ForestIndex.h"
 #include "FileHandler.h"
 

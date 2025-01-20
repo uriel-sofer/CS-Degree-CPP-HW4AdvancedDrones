@@ -1,69 +1,79 @@
 #include <fstream>
 #include <iostream>
+#include <ctime>
 
 #include "FileHandler.h"
 #include "TreeSim.h"
 
-
-int main(int argc, char *argv[])
+// Function to log errors to a file
+void logError(const std::string& message)
 {
-    // 3 arguments without seed, 4 arguments with the seed, everything else is wrong
-    // Increment by one because program name is also an argument
+    // Write only if opened
+    if (std::ofstream logFile("error.log", std::ios::trunc); logFile.is_open())
+        logFile << message << std::endl;
+}
+
+// Function to parse command-line arguments
+void parseArguments(const int argc, char* argv[], int& seed)
+{
+    // Wrong arguments
     if (not(argc >= 4 and argc <= 5))
+        throw std::invalid_argument("Usage: " + std::string(argv[0]) +
+            " <config_file> <init_file> <output_file> Optional: <seed>");
+
+    // Seed parsing
+    if (argc == 5)
+        seed = std::strtol(argv[4], nullptr, 10);
+    else
+        seed = static_cast<int>(std::time(nullptr));
+}
+
+int main(int argc, char* argv[])
+{
+    int seed = 0;
+
+    // Parse arguments and initialize the seed
+    try
     {
-        std::cerr << "Usage: " << argv[0] << " <config_file> <init_file> <output_file> Optional: <seed>" << std::endl;
-        //std::cerr << "Error; invalid input" << std::endl;
+        parseArguments(argc, argv, seed);
+    }
+    catch (const std::invalid_argument& e)
+    {
+        std::cerr << "Error; invalid input" << std::endl;
+        logError(e.what());
         return 1;
     }
 
-    int seed = 0;
-    if (argc == 5)
-    {
-        seed = std::strtol(argv[4], nullptr, 10);
-    }
+    std::srand(seed);
 
-    std::srand(seed != 0 ? seed : static_cast<unsigned int>(std::time(nullptr)));
-
-    // Parse through the files
+    // Parse config and init/locations files
     Config config;
     Init init;
-
 
     try
     {
         config = ConfigParser(argv[1]);
         init = InitParser(argv[2]);
-    } catch (std::runtime_error &e)
-    {
-        // Log the error to a file
-        std::ofstream logFile("error.log", std::ios::trunc); // Open in append mode
-        if (logFile.is_open())
-        {
-            logFile << e.what() << std::endl;
-            logFile.close();
-        } else
-        {
-            std::cerr << "Unable to open log file for writing." << std::endl;
-            return 1;
-        }
-
     }
-
-
-    if (config.iterations < 0 || init.initialLocations.getSize() == 0)
+    catch (const std::runtime_error& e)
     {
-        //std::cerr << "Error: Invalid configuration or initialization\n";
         std::cerr << "Error; invalid input" << std::endl;
+        logError(e.what());
         return 1;
     }
 
-    try
+    // Validate configuration and initialization
+    if (config.iterations < 0 || init.initialLocations.getSize() == 0)
     {
-        TreeSim simulation(config, init);
-        simulation.run();
-        simulation.saveState(argv[3]); // Output file
-    } catch (...)
-    {}
+        std::cerr << "Error; invalid input" << std::endl;
+        logError("Invalid configuration or initialization");
+        return 1;
+    }
+
+    // Run the simulation
+    TreeSim simulation(config, init);
+    simulation.run();
+    simulation.saveState(argv[3]); // Output file
 
     return 0;
 }
