@@ -8,6 +8,15 @@ FixedWing::FixedWing(const DirectionalVector &loc, const DirectionalVector &vel,
     const char droneType) : Drone(loc, vel, target, droneType)
 {}
 
+FixedWing& FixedWing::operator=(FixedWing&& other)
+{
+    if (this != &other)
+    {
+        Drone::operator=(std::move(other));
+    }
+    return *this;
+}
+
 void FixedWing::updateVelocity(const Drone &currentGB, const double alpha, const double beta, const double gamma)
 {
     Drone::updateVelocity(currentGB, ALPHA, BETA, GAMMA);

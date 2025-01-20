@@ -21,7 +21,7 @@ public:
 
     FixedWing & operator=(const FixedWing &other) = default;
 
-    FixedWing & operator=(FixedWing &&other) = default;
+    FixedWing & operator=(FixedWing &&other);
 
     void updateVelocity(const Drone &currentGB, double alpha, double beta, double gamma) override;
 

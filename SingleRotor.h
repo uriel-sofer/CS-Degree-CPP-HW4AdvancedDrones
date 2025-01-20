@@ -22,7 +22,7 @@ public:
 
     SingleRotor& operator=(const SingleRotor &other) = default;
 
-    SingleRotor& operator=(SingleRotor &&other) = default;
+    SingleRotor& operator=(SingleRotor &&other);
 
     void updateVelocity(const Drone &currentGB, double alpha, double beta, double gamma) override;
 

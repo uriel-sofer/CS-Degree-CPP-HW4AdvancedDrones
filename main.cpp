@@ -9,7 +9,8 @@
 void logError(const std::string& message)
 {
     // Write only if opened
-    if (std::ofstream logFile("error.log", std::ios::trunc); logFile.is_open())
+    std::ofstream logFile("error.log", std::ios::trunc);
+    if (logFile.is_open())
         logFile << message << std::endl;
 }
 
@@ -70,10 +71,18 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // Run the simulation
-    TreeSim simulation(config, init);
-    simulation.run();
-    simulation.saveState(argv[3]); // Output file
+    try
+    {
+        // Run the simulation
+        TreeSim simulation(config, init);
+        simulation.run();
+        simulation.saveState(argv[3]); // Output file
+    }
+    catch (std::runtime_error& e)
+    {
+        logError(e.what());
+        return 1;
+    }
 
     return 0;
 }
